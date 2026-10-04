@@ -4,7 +4,7 @@
 
 Northstar Repairs represents a five-person repair shop whose active jobs depend on one on-premises VM. The business risk is losing repair records and interrupting customer collections when that VM fails. The implementation addresses that risk with consistent off-host snapshots, an explicit restore path, restricted AWS access, operational telemetry, and infrastructure as code.
 
-**Verification:** the application, persistence and local SQLite recovery workflow have passed tests. Terraform has passed provider-schema validation. Proxmox migration, AWS deployment and cloud recovery have not yet been executed; no measured cloud availability, RPO or RTO is claimed.
+**Verification:** application, persistence and SQLite recovery tests passed locally and on a Linux GitHub Actions runner. Terraform passed provider-schema validation. Proxmox migration, AWS deployment and cloud recovery have not yet been executed; no measured cloud availability, RPO or RTO is claimed.
 
 ## The implementation
 

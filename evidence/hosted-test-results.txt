@@ -1,0 +1,12 @@
+Source commit: 09ddeced9d986fb453f2364f3186554ac0bf2f4a
+Run: https://github.com/Shemarhn/northstar-aws-recovery/actions/runs/37175839709
+Observed conclusion: success; Ubuntu 24.04.5 runner
+Scope: application and local SQLite recovery; no AWS deployment
+
+2026-10-04T04:02:55.6437353Z ##[group]Run python3 -m unittest discover -s tests -v
+2026-10-04T04:02:56.0065271Z test_workflow_and_controls (test_app.AppTest.test_workflow_and_controls) ... ok
+2026-10-04T04:02:56.0428982Z test_committed_wal_data_is_included (test_recovery.RecoveryTest.test_committed_wal_data_is_included) ... ok
+2026-10-04T04:02:56.0744835Z test_missing_source_is_rejected (test_recovery.RecoveryTest.test_missing_source_is_rejected) ... ok
+2026-10-04T04:02:56.1080532Z test_snapshot_survives_source_loss (test_recovery.RecoveryTest.test_snapshot_survives_source_loss) ... ok
+2026-10-04T04:02:56.1085567Z Ran 4 tests in 0.352s
+2026-10-04T04:02:56.1086463Z OK

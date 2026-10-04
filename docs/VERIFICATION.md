@@ -10,6 +10,8 @@
 
 The [evidence directory](../evidence/README.md) contains timestamps, raw test output, source hashes, actual records and a clearly labeled local application image.
 
+The same four tests and Bash syntax checks also passed on a Linux GitHub-hosted runner for commit `09ddece`; the workflow URL and actual log excerpt are preserved in the evidence record.
+
 ## Not observed
 
 No Proxmox/AWS target was executed. Cloud bootstrap, enforced permissions, S3 schedules, alarm delivery, migration comparison, replacement recovery and billing remain unverified. Local file restoration does not demonstrate S3 recovery or the systemd restore path. No measured cloud RPO/RTO is reported.

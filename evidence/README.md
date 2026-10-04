@@ -21,6 +21,10 @@ The image renders an HTML response captured from the actual application running 
 
 Four tests passed. The structured record includes execution time, exact before/restored records and source SHA256 values. The local restore uses the actual snapshot implementation and an independently stored local file; it does not execute S3 transfer or the Linux restore script.
 
+## Hosted verification
+
+The same four tests and shell-syntax checks also passed on an Ubuntu 24.04.5 GitHub-hosted runner for commit `09ddece`. The [actual workflow run](https://github.com/Shemarhn/northstar-aws-recovery/actions/runs/37175839709) and [captured test-log excerpt](hosted-test-results.txt) provide a second execution environment. This is application/recovery verification under Linux, not an AWS deployment test. The read-only verification workflow is committed under .github/workflows/.
+
 ## Infrastructure verification boundary
 
 Terraform 1.9.8 formatting and provider-schema validation previously passed with AWS 5.100.0 and archive 2.8.1. The lockfile records these dependencies. These checks establish syntactic/schema validity, not an observed AWS deployment.
