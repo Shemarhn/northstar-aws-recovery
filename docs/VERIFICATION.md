@@ -1,23 +1,17 @@
-# Actual verification status
+# Verification record
 
-Artifact creation and local checks completed on 2026-10-03. No Proxmox or AWS environment was accessed or deployed.
+## Executed locally
 
-| Check | Actual result |
-|---|---|
-| Python 3.12 application integration test | PASS: one comprehensive test, including HTTP auth rejection, CSRF rejection, job creation/update, HTML escaping, invalid input rejection, online snapshot row/integrity checking and persistence across process restart |
-| PowerShell payload packaging | PASS in the available pwsh session; Windows PowerShell separately blocked execution under its policy, so the guide provides a Bash/WSL alternative |
-| Terraform 1.9.8 init, backend disabled | PASS; signed AWS 5.100.0 and archive 2.8.1 providers downloaded; lockfile created |
-| Terraform validate | PASS: configuration valid against installed provider schemas |
-| Terraform fmt check | PASS |
-| Bash syntax checks | PASS for installation, backup, metrics, restore and bootstrap template; not a runtime deployment test |
-| Repository links/release archive | Checked locally during packaging |
-| Bash/systemd/dnf/cloud-init runtime | NOT RUN: no Linux target used |
-| Terraform plan/apply/destroy against AWS | NOT RUN: no account credentials supplied |
-| AWS IAM/network/monitoring/backup/recovery tests | NOT RUN |
-| Proxmox baseline/migration tests | NOT RUN |
-| Cost/credit eligibility and budgets in your account | NOT RUN; official documentation reviewed, account offer must be checked |
-| Environment screenshots | NOT CAPTURED; evidence checklist supplied |
+- Four application/recovery tests passed: workflow, auth/CSRF, input handling, restart persistence, WAL snapshot consistency, missing-source rejection and source-loss recovery.
+- A running instance of the application produced the published three-job demonstration response.
+- A local dataset was removed, restored from a verified snapshot, and compared by original ID/record/status. All three records matched and integrity_check returned ok.
+- Bash syntax checks passed for installation, backup, restore, metrics, packaging and bootstrap.
+- Terraform formatting and provider-schema validation passed earlier in this implementation with Terraform 1.9.8, AWS 5.100.0 and archive 2.8.1.
 
-Local validation does not prove OS installation, cloud bootstrap, IAM enforcement or recoverability in your account. Execute the deployment/validation guides, save actual results and update this status before publishing outcome claims. No successful cloud test or achieved RPO/RTO is fabricated.
+The [evidence directory](../evidence/README.md) contains timestamps, raw test output, source hashes, actual records and a clearly labeled local application image.
 
-Source assumptions: [AL2023 AWS CLI](https://docs.aws.amazon.com/linux/al2023/ug/awscli2.html), [preinstalled SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ami-preinstalled-agent.html), [AL2023 AMI parameter](https://docs.aws.amazon.com/linux/al2023/ug/ec2.html). Costs and Free Tier references are in COSTS.md.
+## Not observed
+
+No Proxmox/AWS target was executed. Cloud bootstrap, enforced permissions, S3 schedules, alarm delivery, migration comparison, replacement recovery and billing remain unverified. Local file restoration does not demonstrate S3 recovery or the systemd restore path. No measured cloud RPO/RTO is reported.
+
+Source assumptions: [AL2023 AWS CLI](https://docs.aws.amazon.com/linux/al2023/ug/awscli2.html), [preinstalled SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ami-preinstalled-agent.html), [AL2023 AMI parameter](https://docs.aws.amazon.com/linux/al2023/ug/ec2.html).

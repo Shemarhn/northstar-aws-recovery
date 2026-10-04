@@ -7,6 +7,9 @@ DB=os.environ.get('DB_PATH','jobs.sqlite')
 USER=os.environ.get('APP_USER','owner')
 PASSWORD=os.environ['APP_PASSWORD']
 TOKEN=secrets.token_urlsafe(32)
+STATUSES=('Received','In progress','Ready','Collected')
+def status_options(selected):
+    return ''.join(f'<option{" selected" if status==selected else ""}>{status}</option>' for status in STATUSES)
 @contextmanager
 def connect():
     c=sqlite3.connect(DB,timeout=10)
@@ -37,8 +40,8 @@ class Handler(BaseHTTPRequestHandler):
         if self.path!='/': return self.reply(404,'Not found')
         with connect() as c: rows=c.execute('SELECT id,customer,device,status,created FROM jobs ORDER BY id DESC').fetchall()
         esc=lambda x: html.escape(str(x),quote=True)
-        body=''.join('<tr>'+''.join('<td>'+esc(x)+'</td>' for x in row)+f'<td><form method="post" action="/status"><input type="hidden" name="token" value="{TOKEN}"><input type="hidden" name="id" value="{row[0]}"><select name="status"><option>Received</option><option>In progress</option><option>Ready</option><option>Collected</option></select><button>Update</button></form></td></tr>' for row in rows)
-        self.reply(200,f"""<!doctype html><html lang="en"><meta charset="utf-8"><title>Northstar Repairs</title><style>body{{font:16px system-ui;max-width:1100px;margin:40px auto;padding:20px;background:#f3f6fa;color:#172b4d}}table{{width:100%;border-collapse:collapse;background:white}}td,th{{text-align:left;padding:12px;border-bottom:1px solid #ddd}}input,select,button{{padding:8px;margin:4px}}button{{background:#155e75;color:white;border:0}}</style><h1>Northstar Repairs</h1><p>Repair intake and collection tracker · synthetic lab data only</p><form method="post" action="/jobs"><input type="hidden" name="token" value="{TOKEN}"><input name="customer" maxlength="100" placeholder="Customer alias" required><input name="device" maxlength="160" placeholder="Device / issue" required><button>Create repair job</button></form><table><tr><th>Job</th><th>Customer</th><th>Device / issue</th><th>Status</th><th>Created UTC</th><th>Action</th></tr>{body}</table></html>""")
+        body=''.join('<tr>'+''.join('<td>'+esc(x)+'</td>' for x in row)+f'<td><form method="post" action="/status"><input type="hidden" name="token" value="{TOKEN}"><input type="hidden" name="id" value="{row[0]}"><select name="status">{status_options(row[3])}</select><button>Update</button></form></td></tr>' for row in rows)
+        self.reply(200,f"""<!doctype html><html lang="en"><meta charset="utf-8"><title>Northstar Repairs</title><style>body{{font:16px system-ui;max-width:1100px;margin:40px auto;padding:20px;background:#f3f6fa;color:#172b4d}}table{{width:100%;border-collapse:collapse;background:white}}td,th{{text-align:left;padding:12px;border-bottom:1px solid #ddd}}input,select,button{{padding:8px;margin:4px}}button{{background:#155e75;color:white;border:0}}</style><h1>Northstar Repairs</h1><p>Repair intake and collection tracker · synthetic demonstration data</p><form method="post" action="/jobs"><input type="hidden" name="token" value="{TOKEN}"><input name="customer" maxlength="100" placeholder="Customer alias" required><input name="device" maxlength="160" placeholder="Device / issue" required><button>Create repair job</button></form><table><tr><th>Job</th><th>Customer</th><th>Device / issue</th><th>Status</th><th>Created UTC</th><th>Action</th></tr>{body}</table></html>""")
     def do_POST(self):
         if not self.auth(): return
         try:
@@ -54,7 +57,7 @@ class Handler(BaseHTTPRequestHandler):
                     c.execute('INSERT INTO jobs(customer,device) VALUES(?,?)',(customer,device))
                 elif self.path=='/status':
                     status=val('status')
-                    if status not in ('Received','In progress','Ready','Collected'): return self.reply(400,'Invalid status')
+                    if status not in STATUSES: return self.reply(400,'Invalid status')
                     c.execute('UPDATE jobs SET status=? WHERE id=?',(status,int(val('id'))))
                 else: return self.reply(404,'Not found')
             self.send_response(303); self.send_header('Location','/'); self.end_headers()

@@ -1,6 +1,6 @@
 # Recovery runbook
 
-Owner: fill your name. Workload: synthetic Northstar Repairs. Dependencies: AWS access, S3 backup, release payload, protected Terraform state, outbound HTTPS and SSM. App password changes on a fresh server.
+**Owner:** Shemar Marks. **Workload:** Northstar Repairs proof of concept. Dependencies: AWS access, S3 backup, release payload, protected Terraform state, outbound HTTPS and SSM. App password changes on a fresh server.
 
 ## Triage
 
@@ -20,7 +20,7 @@ Owner: fill your name. Workload: synthetic Northstar Repairs. Dependencies: AWS 
 
 ## Replace failed EC2
 
-Confirm a verified backup and privately saved state before the exercise. Freeze writes, record exact backup key/old ID and start time. From terraform/:
+Confirm a verified backup and privately saved state before replacement. Freeze writes, record exact backup key/old ID and start time. From terraform/:
 
 ```bash
 terraform plan -replace=aws_instance.app -out=rebuild.tfplan
@@ -31,7 +31,7 @@ terraform output
 
 This destroys the old instance/root disk, retaining S3. The new server starts with EMPTY data and a NEW password. That alone is not recovery.
 
-Wait for SSM/bootstrap, update INSTANCE_ID, retrieve new password privately, restore the verified key, reconnect forwarding to the new instance. Verify original records, run backup and metrics, observe new-ID alarms. Measure RTO including bootstrap/access/restore. Terraform removes old-ID alarms. Record failed attempts too.
+Wait for SSM/bootstrap, update INSTANCE_ID, retrieve new password privately, restore the verified key, reconnect forwarding to the new instance. Verify original records, run backup and metrics, observe new-ID alarms. Measure RTO including bootstrap/access/restore. Terraform removes old-ID alarms. Failed attempts belong in the incident record.
 
 ## Failed bootstrap
 
@@ -41,4 +41,4 @@ Inspect /var/log/cloud-init-output.log and /var/log/northstar-bootstrap.log; che
 
 Before cutover, resume the frozen Proxmox workload if AWS validation fails. After accepting AWS writes, export both DBs and reconcile records manually before overwriting anything.
 
-Deleted bucket, compromised administrator, revoked account or regional outage exceed this same-account design. Keep an encrypted offline export. Production needs independent protected backups and tested access recovery. Do not claim HA or zero data loss.
+Deleted bucket, compromised administrator, revoked account or regional outage exceed this same-account design. Keep an encrypted offline export. Production needs independent protected backups and tested access recovery. The implementation does not provide HA or zero data loss.

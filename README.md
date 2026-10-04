@@ -1,45 +1,40 @@
-# Project 1: Northstar Repairs recovery lab
+# Northstar Repairs — recoverable small-business infrastructure
 
-A fictional five-person repair shop keeps active repairs on one Proxmox VM. Losing the VM means losing intake records and repair statuses. This project protects that workflow with controlled AWS access, automated consistent backups, monitoring, reproducible deployment and tested recovery.
+**An implemented proof of concept by Shemar Marks:** a repair-workflow application and the infrastructure code that protects its data, controls remote access, detects operational failures, and reconstructs its hosting environment.
 
-The working app lets staff create repair jobs and move them through Received, In progress, Ready and Collected. Use synthetic customer aliases only. Python's standard library and SQLite keep deployment small; Docker is unnecessary for this workload.
+Northstar Repairs represents a five-person repair shop whose active jobs depend on one on-premises VM. The business risk is losing repair records and interrupting customer collections when that VM fails. The implementation addresses that risk with consistent off-host snapshots, an explicit restore path, restricted AWS access, operational telemetry, and infrastructure as code.
 
-## Follow this sequence
+**Verification:** the application, persistence and local SQLite recovery workflow have passed tests. Terraform has passed provider-schema validation. Proxmox migration, AWS deployment and cloud recovery have not yet been executed; no measured cloud availability, RPO or RTO is claimed.
 
-1. [General installation and migration reference](docs/SETUP.md).
-2. [Validate security, alarms and recovery](docs/VALIDATION.md).
-3. [Recover or rebuild](docs/RUNBOOK.md).
-4. [Capture evidence](docs/EVIDENCE.md) and fill the [case study](docs/CASE-STUDY.md).
-5. [Export and destroy safely](docs/CLEANUP.md).
+## The implementation
 
-Read [cost assumptions](docs/COSTS.md), [architecture diagrams](docs/ARCHITECTURE.md), [IAM responsibilities](docs/IAM.md), and [actual verification status](docs/VERIFICATION.md) before deployment.
+| Business need | Implemented mechanism | Source |
+|---|---|---|
+| Preserve the repair process | Authenticated intake and status tracking with durable SQLite records | [Application](app/server.py) |
+| Recreate hosting | Terraform provisions compute, network, identity, storage and alarms; bootstrap installs the workload | [Infrastructure](terraform/main.tf), [bootstrap](deploy/bootstrap.sh.tftpl) |
+| Restrict remote exposure | Loopback listener, zero security-group ingress, Session Manager access, IMDSv2 | [Service](deploy/northstar.service), [security model](docs/IAM.md) |
+| Recover business records | Consistent snapshots, hourly S3 uploads, verified restore and preserved rollback data | [Snapshot](scripts/snapshot.py), [backup](scripts/backup.sh), [restore](scripts/restore.sh) |
+| Detect operational failure | App, disk and backup-age signals; four alarms and SNS delivery | [Telemetry](scripts/metrics.sh), [monitoring definitions](terraform/main.tf) |
+| Keep scope proportionate | Small compute and bounded storage/log retention; no NAT, ALB or managed database | [Decisions](docs/DECISIONS.md), [cost model](docs/COSTS.md) |
 
-## Repository map
+## Architecture
 
-| Folder | Purpose |
-|---|---|
-| app | Repair tracker, authentication, validation, SQLite persistence |
-| deploy | systemd service and AWS cloud-init bootstrap |
-| scripts | Installation, packaging, consistent snapshots, S3 backups, telemetry, restore |
-| terraform | One EC2, VPC, S3, IAM, CloudWatch and SNS |
-| tests | Application workflow/security and SQLite snapshot tests |
-| docs | Deployment, operations, validation, diagrams and case study |
-| evidence | Result ledger; screenshots must come from actual execution |
+![AWS implementation topology](docs/diagrams/aws-implementation.svg)
 
-The app binds to loopback and runs as an unprivileged service. Proxmox uses an SSH tunnel; AWS uses Session Manager. The AWS security group has no inbound rules. A public address supplies outbound HTTPS without NAT or paid interface endpoints. Hourly backups use SQLite's online snapshot API; the instance can write only the backup prefix and cannot delete backups. S3 blocks public access, encrypts objects, versions data and denies non-TLS access. Three custom metrics and four alarms cover application health, disk usage, backup freshness and EC2 status. Bootstrap and operations logs have seven-day CloudWatch retention.
+The same application provides the Proxmox baseline workload and the AWS recovery target. Staff reach the service through an encrypted tunnel. An instance role separates release reads from backup writes. S3 holds data independently of the root disk; CloudWatch reports the state of the application and its backup process.
 
-## Acceptance targets and limits
+[Baseline and production-reference diagrams](docs/ARCHITECTURE.md) explain the original failure boundary and the additional services justified by production requirements. The production reference is separate from the implemented single-server scope.
 
-Targets, not achieved results: normal scheduled-backup RPO ≤60 minutes; recovery RTO ≤30 minutes after detection/operator access. Measure these. Backup failures can exceed that RPO; freshness alarms begin after age exceeds two hours for two five-minute periods.
+## Engineering record
 
-One server/AZ remains a single point of failure. Backup is in the same account/region; versioning is not immutable retention. One shared credential and SQLite suit synthetic learning, not sensitive client data. Local health checks do not prove end-to-end access. No public TLS endpoint, HA, external uptime checker, user-specific audit or point-in-time restore is claimed. See the production reference separately; it is not deployed.
+- [Case study](docs/CASE-STUDY.md): business risk, intervention and substantiated findings.
+- [Implementation](docs/IMPLEMENTATION.md): application, bootstrap, IAM, backup and monitoring behavior.
+- [Decisions](docs/DECISIONS.md): alternatives, constraints and tradeoffs.
+- [Evidence](evidence/README.md): actual test results and execution limits.
+- [Recovery runbook](docs/RUNBOOK.md): the operational artifact for diagnosis, restore and replacement.
 
-The baseline is safe on a trusted LAN. Its weakness is manual rebuild, absent off-host scheduled backup and absent monitoring, not deliberately unsafe exposure.
+## Scope
 
-```bash
-python3 -m unittest discover -s tests -v
-```
+The proof of concept uses synthetic data, a single server, one shared staff credential and same-account regional backups. It implements recovery mechanisms rather than high availability. Versioning is not immutable retention; local health telemetry is not an external availability check. Recovery objectives are a normal hourly data-loss window and a 30-minute operator-led restore, both design targets rather than measured cloud outcomes.
 
-Protect local Terraform state and plans; never commit them, credentials, tfvars or private evidence. Commit the generated provider lockfile after Terraform init. The latest AL2023 AMI and package updates mean deployments are repeatable, not bit-for-bit identical; pin resolved versions when needed.
-
-Environment execution is separate from artifact creation. See the verification record for actual completed checks; cloud recovery and screenshots remain unverified until performed.
+This repository contains application code, Terraform, configuration, automation, diagrams and an engineering record. Personal deployment coaching and raw account evidence are maintained separately.

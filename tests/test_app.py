@@ -29,7 +29,7 @@ class AppTest(unittest.TestCase):
   self.assertEqual(self.request('POST','/jobs',urlencode(dict(token=token,customer='<script>',device='Laptop')),True)[0],303)
   page=self.request('GET','/',auth=True)[1]; self.assertIn('&lt;script&gt;',page)
   self.assertEqual(self.request('POST','/status',urlencode(dict(token=token,id=1,status='Ready')),True)[0],303)
-  self.assertIn('Ready',self.request('GET','/',auth=True)[1])
+  self.assertIn('<option selected>Ready</option>',self.request('GET','/',auth=True)[1])
   self.assertEqual(self.request('POST','/status',urlencode(dict(token=token,id=1,status='invalid')),True)[0],400)
   self.assertEqual(self.request('POST','/jobs',urlencode(dict(token=token,customer='x'*101,device='Laptop')),True)[0],400)
   dest=Path(self.tmp.name)/'backup.sqlite'

@@ -1,0 +1,12 @@
+Executed UTC: 2026-10-04T03:58:02.219670+00:00
+Command: python -m unittest discover -s tests -v
+
+test_workflow_and_controls (test_app.AppTest.test_workflow_and_controls) ... ok
+test_committed_wal_data_is_included (test_recovery.RecoveryTest.test_committed_wal_data_is_included) ... ok
+test_missing_source_is_rejected (test_recovery.RecoveryTest.test_missing_source_is_rejected) ... ok
+test_snapshot_survives_source_loss (test_recovery.RecoveryTest.test_snapshot_survives_source_loss) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.636s
+
+OK

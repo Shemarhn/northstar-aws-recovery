@@ -1,56 +1,29 @@
-# Architecture
+# System architecture
 
-## Proxmox baseline
+## Baseline dependency
 
-```mermaid
-flowchart LR
-    Staff[Staff workstation] -->|SSH tunnel| VM[Proxmox Ubuntu VM]
-    VM --> App[Loopback repair desk / systemd]
-    App --> DB[(SQLite on VM disk)]
-    Loss[VM or disk loss] -.-> DB
-```
+![Baseline topology](diagrams/baseline.svg)
 
-Manual installation, absent scheduled off-host backup/monitoring, operator-dependent rebuild. Access remains safe on trusted LAN. A Proxmox backup is complementary but counts only if actually configured and restored.
+The baseline places the application and its records on one Proxmox-hosted Ubuntu VM. Its meaningful weakness is the recovery dependency: manual configuration, no scheduled off-host data copy and no operational alarm model. The baseline still uses safe LAN/tunnel access.
 
-## Deployed single-server lab
+## Implemented AWS topology
 
-```mermaid
-flowchart LR
-    Staff[Staff / MFA AWS identity] -->|Encrypted tunnel| SSM[Systems Manager]
-    SSM <-->|Outbound HTTPS agent| EC2[AL2023 EC2 / public subnet / zero ingress]
-    EC2 --> App[Loopback app / unprivileged systemd]
-    App --> DB[(Encrypted gp3 / SQLite)]
-    EC2 -->|Hourly consistent snapshot| S3[(Private encrypted versioned S3)]
-    S3 -->|Release / selected restore| EC2
-    EC2 -->|Metrics / operations logs| CW[CloudWatch / four alarms]
-    CW --> SNS[Confirmed email]
-    IaC[Terraform / protected local state] --> EC2
-    IaC --> S3
-    EC2 -->|HTTPS via IGW| APIs[AWS APIs / OS repositories]
-```
+![AWS implementation](diagrams/aws-implementation.svg)
 
-Public IPv4/IGW supply outbound access without NAT or paid endpoints. Zero inbound SG rules; outbound TCP443 only. Amazon-provided VPC DNS works independently of SG egress rules. App credential is generated on host. EBS uses its AWS-managed key; S3 SSE-S3 avoids a custom KMS key. Versioned backups and scoped IAM reduce accidental loss, not privileged compromise. Cron/agent run as root; app runs as northstar. Solo local state has no shared backend locking.
+One EC2 instance hosts the same application and SQLite dataset. The security group has zero ingress. A public address and IGW support outbound HTTPS for SSM, S3, monitoring and OS packages. Logical staff access travels through the SSM agent's encrypted channel, not an inbound application port.
 
-## Production reference — not deployed
+S3 separates recoverable records from the root disk. The role reads release/backup objects and writes only backups; monitoring reports both application condition and backup freshness. Terraform describes the resource relationships and a release fingerprint triggers visible replacement when packaged code changes.
 
-```mermaid
-flowchart TD
-    Users[Individual users / MFA] --> DNS[DNS / managed TLS]
-    DNS --> Edge[WAF / public ALB across two AZs]
-    Edge --> A[Private app instances AZ A]
-    Edge --> B[Private app instances AZ B]
-    A --> DB[(Multi-AZ managed relational DB)]
-    B --> DB
-    A --> Secrets[Secrets Manager / KMS]
-    B --> Secrets
-    DB --> Backup[Protected cross-account / regional backups]
-    CI[Reviewed CI/CD / temporary roles] --> A
-    CI --> B
-    Ops[SSM / private endpoints or controlled egress] --> A
-    Ops --> B
-    A --> Monitor[Central logs / audit / external checks]
-    B --> Monitor
-    Monitor --> Respond[On-call response]
-```
+The diagram represents the code-defined topology. It does not assert an observed deployment. [Implementation detail](IMPLEMENTATION.md) and [decisions](DECISIONS.md) document the exact controls and their limitations.
 
-Reference only; no production Terraform is supplied. Replace SQLite/shared credentials with managed DB and individual roles, add TLS, multi-AZ scaling, secrets rotation, protected cross-account backup and tested point-in-time restore. Add WAF/rate limits, patches, audit logs, external availability checks and explicit SLO/RPO/RTO requirements. Price private endpoints/controlled egress and recurring services separately. Actual customer information requires appropriate privacy and retention requirements.
+## Recovery sequence
+
+![Recovery sequence](diagrams/recovery.svg)
+
+A newly provisioned server is not a recovered business service until a verified snapshot is restored and original records are compared. The restore preserves the previous DB/journal files for rollback. Infrastructure and data recovery are separate, explicit stages.
+
+## Production reference
+
+![Production reference](diagrams/production-reference.svg)
+
+The reference introduces individual identity, managed TLS, multi-AZ application hosting, managed relational storage, protected cross-account/region backups, secrets rotation and external availability checks. These services are not in the implemented Terraform. Their inclusion depends on real operating requirements and an operating budget rather than the portfolio scope alone.

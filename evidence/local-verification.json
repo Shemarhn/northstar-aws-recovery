@@ -1,0 +1,72 @@
+{
+  "executed_utc": "2026-10-04T03:58:02.219670+00:00",
+  "environment": "local Python 3.12; no Proxmox or AWS execution",
+  "unit_and_integration_tests": {
+    "result": "passed",
+    "count": 4,
+    "command": "python -m unittest discover -s tests -v"
+  },
+  "bash_syntax": {
+    "scripts/install.sh": "passed",
+    "scripts/backup.sh": "passed",
+    "scripts/restore.sh": "passed",
+    "scripts/metrics.sh": "passed",
+    "scripts/package.sh": "passed",
+    "deploy/bootstrap.sh.tftpl": "passed"
+  },
+  "local_recovery": {
+    "source_removed": true,
+    "before_rows": [
+      [
+        1,
+        "Customer-A",
+        "Laptop battery",
+        "In progress"
+      ],
+      [
+        2,
+        "Customer-B",
+        "Phone screen",
+        "Ready"
+      ],
+      [
+        3,
+        "Customer-C",
+        "Printer feed",
+        "Received"
+      ]
+    ],
+    "restored_rows": [
+      [
+        1,
+        "Customer-A",
+        "Laptop battery",
+        "In progress"
+      ],
+      [
+        2,
+        "Customer-B",
+        "Phone screen",
+        "Ready"
+      ],
+      [
+        3,
+        "Customer-C",
+        "Printer feed",
+        "Received"
+      ]
+    ],
+    "rows_match": true,
+    "integrity_check": "ok",
+    "snapshot_sha256": "ae0b684c2fe41bde57c189feddac8adb4c622ccde170328c63433ab1d0919e80"
+  },
+  "application_preview": "HTML captured from the actual locally running app with synthetic fixtures; expired hidden tokens replaced",
+  "cloud_execution": "not performed",
+  "source_sha256": {
+    "app/server.py": "56942a58349768f815c94fc616f93f867cca0e92ded8d90fbe0ab5883e6b499f",
+    "scripts/snapshot.py": "481f3d54fe9433959cb9d4df0d068f87dbc527ccb96a78e3538196ec81eed0ce",
+    "tests/test_app.py": "1359aa1ca76ef0b228616f22da3dd2b1d710ba96c35edba78c47e4f173471560",
+    "tests/test_recovery.py": "16b346267560492605c423710cd7065240c3b41bcc0dc7019cdf19cd0beb8fe4",
+    "terraform/main.tf": "917aea397e9f772af6d1909faba411f5ea37b0be64ed35bde39786d77ea93563"
+  }
+}
