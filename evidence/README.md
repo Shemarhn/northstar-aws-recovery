@@ -10,7 +10,7 @@ The operator completed migration and recovery in us-east-2 on 2026-10-04. This i
 | [CloudWatch/SNS email list](monitoring/cloudwatch-sns-email.png) | App, disk, backup ALARM/OK delivery and status-check alarm in Ohio | Email bodies and timezone not visible. Causes and detection latency not established |
 | [Recovery summary](disaster-recovery/observed-results.md) | Attributed 0-to-6 restore, integrity ok and 12-minute operator measurement | Summary, not a raw terminal transcript |
 | Proxmox baseline and migration | Operator reports completed Proxmox-to-AWS lab | Earlier baseline/migration attachments unavailable in the retrieved history |
-| Teardown | Pending | No deletion claimed |
+| [Teardown verification](teardown/verification.json) | 25 resources destroyed, empty state, no active Northstar lab resources | Historical instance/metric records can remain |
 
 ![Recovered workload](disaster-recovery/post-recovery-app.png)
 
@@ -48,3 +48,7 @@ Terraform formatting and provider-schema validation previously passed with Terra
 ## Live closeout checks
 
 [Direct CloudShell verification]( disaster-recovery/closeout-checks.md ) confirms the six-job healthy app, SQLite integrity and exported migration/recovery backup contents.
+
+## Completed teardown
+
+[Teardown record](../docs/TEARDOWN.md) and [verified cleanup screenshot](teardown/verified-cleanup.png) document the 25-resource destruction and independent AWS inventory checks. Private backup exports remain outside the public repository in CloudShell.

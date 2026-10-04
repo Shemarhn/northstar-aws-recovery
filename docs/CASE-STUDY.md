@@ -16,7 +16,7 @@ Session Manager supports administration and encrypted port forwarding. The app b
 
 ## Migration
 
-The operator completed the Proxmox-to-AWS workload migration in the lab. The project record describes an S3 migration archive and the active AWS application. This closeout recovered the final app and email screenshots, but no original Proxmox baseline or migration command transcript. The migration is recorded as an operator-observed result, with the retained artifacts identified separately.
+The operator completed the Proxmox-to-AWS workload migration in the lab. The project record describes an S3 migration archive and the active AWS application. This closeout recovered the final app and email screenshots and directly inspected the exported migration database with five jobs and integrity ok. No original Proxmox baseline screenshot or migration command transcript was retrieved. The migration is recorded as an operator-observed result, with the retained artifacts identified separately.
 
 ## Disaster-recovery exercise
 
@@ -26,13 +26,13 @@ The project record describes deliberate EC2 replacement, an initially empty repl
 
 ## Monitoring evidence
 
-The original email screenshot shows Northstar app, disk and backup alarms in both `ALARM` and `OK`, plus a status-check alarm for the replacement instance in US East (Ohio). This establishes notification delivery during the lab. Missing telemetry during replacement/bootstrap may account for transitions because the configured alarms treat missing data as breaching. The application-health alarm was the alarm under test. Live CloudShell history also shows the service-stop command, a failed health request and metric publication.
+The original email screenshot shows Northstar app, disk and backup alarms in both `ALARM` and `OK`, plus a status-check alarm for the replacement instance in US East (Ohio). This establishes notification delivery during the lab. The application-health alarm was the alarm under test. Live CloudShell history also shows the service-stop command, a failed health request and metric publication.
 
 ## Evidence and outcome
 
 [The evidence index](../evidence/README.md) preserves original screenshots, file hashes, visible recovered rows and source attribution. The prior local and Linux-hosted tests remain valid evidence of application behavior and snapshot recovery.
 
-The lab demonstrated workload migration, independent backup recovery and a functioning notification path. Six validation jobs returned in the recovered app, with an operator-measured 12-minute recovery time. AWS teardown remains pending live-state access and must be documented after execution.
+The lab demonstrated workload migration, independent backup recovery and a functioning notification path. Six validation jobs returned in the recovered app, with an operator-measured 12-minute recovery time. After preserving evidence and backups, the closeout destroyed all 25 Terraform-managed resources and independently verified no active Northstar lab resources remained. [Teardown record](TEARDOWN.md).
 
 ## Lessons and limits
 

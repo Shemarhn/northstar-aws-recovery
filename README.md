@@ -39,4 +39,4 @@ The application-health alarm was tested by stopping Northstar and publishing unh
 
 The exercise demonstrated a working migration and operator-led recovery of the synthetic repair register. Local and Linux-hosted application/recovery tests also passed. This remains a single-server proof of concept with a shared app credential and same-account regional backups. Hourly snapshots are a design schedule, not a measured RPO guarantee. The 30-minute recovery design target was met by the reported 12-minute exercise, without establishing a repeatable production SLA.
 
-AWS teardown is pending access to the live Terraform working directory. This repository does not claim the resources have been deleted.
+AWS teardown completed after evidence preservation. Terraform destroyed 25 resources, state is empty, and AWS inventories found no active Northstar lab resources. [Verification record](docs/TEARDOWN.md).

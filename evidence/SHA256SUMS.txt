@@ -1,2 +1,3 @@
 460d8269149742c07b87854c3df4c240f0f0c7901764dace18732b377ca4e5cc  disaster-recovery/post-recovery-app.png
 4ad395060a069ded015edda617e7eb566277bd3bcd1e0f7f50082e37fb179341  monitoring/cloudwatch-sns-email.png
+8efe7fcb0154b59f9b67f6553db30bbc8174ea00aa67f63e3c5bdbb870b7049f  teardown/verified-cleanup.png

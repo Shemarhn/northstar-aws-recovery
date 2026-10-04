@@ -1,21 +1,32 @@
-# AWS lab teardown record
+# AWS lab teardown completed
 
-**Status: pending, not executed.** Region: us-east-2.
+**Verified:** 2026-10-04 21:12:25 UTC (16:12:25 Jamaica)
+**Region:** us-east-2
+**Terraform workspace:** default, existing CloudShell deployment
 
-The closeout preserved the recovered-app and CloudWatch/SNS email originals locally. The live deployment was operated from CloudShell. This checkout has neither live Terraform state nor deployment values, and no authenticated AWS session was available. Do not initialize a fresh empty state and mistake it for the deployed lab.
+## Evidence preserved first
 
-## Required execution sequence
+Original recovered-app and CloudWatch/SNS email screenshots, evidence summaries and the editable deck were published to GitHub in commit 16fd1f6 before deletion. All nine S3 object versions were exported outside the lab bucket to ~/northstar-closeout/ in CloudShell. Database copies passed SQLite integrity checks, including the five-job migration archive and six-job recovery archive.
 
-1. Use the existing Terraform working directory and verify account, workspace, region and state-owned Northstar resource IDs.
-2. Export required S3 recovery/migration backups and evidence outside the bucket. Check downloaded files and hashes. Preserve private state separately, never in the public repo. Screenshots alone are not a backup export.
-3. Set allow_bucket_destroy=true in the existing deployment values while retaining region=us-east-2. Confirm the bucket force_destroy setting is persisted in state. If it is still false, review and apply an isolated configuration plan updating only that bucket setting before generating the destruction plan.
-4. Generate a saved destroy plan and review every resource against the live state. Reject changes outside this Northstar lab. Include versioned S3 object deletion explicitly in the review.
-5. Apply that reviewed saved plan. Record any failed deletions and resolve only within lab scope.
-6. Verify empty Terraform managed state and a refreshed destroy plan with no changes. Check the previously recorded EC2/EBS, VPC/subnet/routes/IGW/SG, S3 bucket, IAM role/profile/policies, CloudWatch alarms/log group and SNS topic/subscription IDs directly in AWS.
-7. Check for orphaned Northstar resources, including old instance resources, in us-east-2. IAM/S3 checks must also cover their global APIs. Distinguish terminated EC2 history and retained metric history from active resources. Record verification output before stating completion.
+Private state and deployment values remain in CloudShell, with a private archive at ~/northstar-closeout-private.tar.gz. They were not downloaded or published. CloudShell storage is separate from the destroyed lab and is not a permanent archival guarantee.
 
-## Completion fields
+## Reviewed and applied
 
-Populate only after execution: account verified privately, Terraform workspace, plan resource count, apply result, deletion failures, remaining-state count, per-service inventory result, evidence/backup export locations and verification timestamp.
+allow_bucket_destroy was changed from false to true in the live deployment values. An isolated saved plan changed only the bucket's force_destroy setting, which was applied before planning destruction.
 
-No resources have been destroyed by this closeout yet. No zero-resource or zero-cost claim is made.
+The full saved destroy plan contained **25 managed resources, all delete actions**, with the Northstar instance tag and the lab resource IDs checked. The plan included the versioned bucket and its data. Terraform applied that saved plan successfully at 21:10:29 UTC:
+
+```text
+Apply complete! Resources: 0 added, 0 changed, 25 destroyed.
+DESTROY_EXIT_CODE=0
+```
+
+## Independent post-destroy checks
+
+Terraform state contained zero entries. A new destroy plan reported: No changes. No objects need to be destroyed.
+
+AWS API inventories independently found zero active Northstar EC2 instances, zero resources in the recorded lab VPC (subnets, security groups, routes, interfaces and gateway), zero recorded root volumes and zero volumes attached to either Northstar instance or named Northstar. Both original and replacement EC2 IDs remained only as terminated history.
+
+Northstar-prefixed bucket, IAM role, CloudWatch alarm/log-group and SNS topic/subscription inventories returned zero. The exact recorded IAM instance profile was also absent. S3 and IAM checks used their global APIs. No unrelated resources were deleted.
+
+[Structured verification](../evidence/teardown/verification.json) and [original terminal screenshot](../evidence/teardown/verified-cleanup.png) preserve the outcome. These checks cover the deployed lab and identified Northstar resources, not every account-level service. Historical CloudWatch metric data and terminated instance records can persist. Actual billing may settle later, so no zero-bill claim is made.
