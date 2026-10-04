@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Release fingerprint: ${release_hash}
+set -euo pipefail
+exec > >(tee /var/log/northstar-bootstrap.log) 2>&1
+dnf install -y python3 unzip gzip util-linux cronie amazon-cloudwatch-agent
+systemctl enable --now amazon-ssm-agent
+mkdir -p /opt/northstar-release
+aws s3 cp 's3://${bucket}/release/app.zip' /tmp/app.zip --region '${region}'
+unzip -o /tmp/app.zip -d /opt/northstar-release
+cd /opt/northstar-release
+bash scripts/install.sh
+TOKEN=$(curl -sf -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 60' http://169.254.169.254/latest/api/token)
+INSTANCE=$(curl -sf -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+printf 'BUCKET=%s\nAWS_DEFAULT_REGION=%s\nINSTANCE_ID=%s\n' '${bucket}' '${region}' "$INSTANCE" > /etc/northstar-aws.env
+chmod 600 /etc/northstar-aws.env
+cat > /etc/cron.d/northstar <<'CRON'
+*/5 * * * * root /opt/northstar/scripts/metrics.sh >> /var/log/northstar-operations.log 2>&1
+0 * * * * root /opt/northstar/scripts/backup.sh >> /var/log/northstar-operations.log 2>&1
+CRON
+systemctl enable --now crond
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'JSON'
+{"logs":{"logs_collected":{"files":{"collect_list":[{"file_path":"/var/log/northstar-bootstrap.log","log_group_name":"${log_group}","log_stream_name":"{instance_id}/bootstrap"},{"file_path":"/var/log/northstar-operations.log","log_group_name":"${log_group}","log_stream_name":"{instance_id}/operations"}]}}}}
+JSON
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+/opt/northstar/scripts/backup.sh
+/opt/northstar/scripts/metrics.sh

@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.env
+*.sqlite*
+*.gz
+*.zip
+.terraform/
+*.tfstate*
+*.tfplan
+terraform.tfvars
+evidence/private/
+payload/
+personal-guidance/
+DEPLOYMENT-WALKTHROUGH.md

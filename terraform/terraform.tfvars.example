@@ -1,0 +1,4 @@
+region = "us-east-1"
+instance_type = "t3.micro"
+alert_email = "YOUR-EMAIL@example.com"
+allow_bucket_destroy = false
