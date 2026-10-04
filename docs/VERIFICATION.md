@@ -12,8 +12,18 @@ The [evidence directory](../evidence/README.md) contains timestamps, raw test ou
 
 The same four tests and Bash syntax checks also passed on a Linux GitHub-hosted runner for commit `09ddece`; the workflow URL and actual log excerpt are preserved in the evidence record.
 
-## Not observed
+## Executed Proxmox and AWS lab
 
-No Proxmox/AWS target was executed. Cloud bootstrap, enforced permissions, S3 schedules, alarm delivery, migration comparison, replacement recovery and billing remain unverified. Local file restoration does not demonstrate S3 recovery or the systemd restore path. No measured cloud RPO/RTO is reported.
+The operator completed the Proxmox-to-AWS migration and EC2 replacement recovery in us-east-2. The recovered app screenshot directly shows six jobs, including DR-TEST. The email screenshot directly shows delivered Northstar ALARM and OK notifications.
 
-Source assumptions: [AL2023 AWS CLI](https://docs.aws.amazon.com/linux/al2023/ug/awscli2.html), [preinstalled SSM Agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ami-preinstalled-agent.html), [AL2023 AMI parameter](https://docs.aws.amazon.com/linux/al2023/ug/ec2.html).
+The prior project record reports zero jobs before S3 restoration, six afterward and SQLite integrity ok. The operator supplied a measured 12-minute RTO. Raw recovery command output, exact timing endpoints and original Proxmox screenshots were not retrievable in this closeout. These results are attributed to the operator/project record rather than presented as new execution here.
+
+## Verification limits
+
+The application-health alarm test is confirmed by live CloudShell history showing a stopped service, failed health check and metrics publication. ALARM/OK delivery appears in the retained email screenshot. Source defines zero ingress, IMDSv2, scoped IAM and hourly S3 backups. Complete permission-denial testing, schedule reliability, achieved RPO, production availability and actual billing totals are not established by the retained artifacts.
+
+Teardown has not been executed in this closeout. See [evidence](../evidence/README.md) and [teardown status](TEARDOWN.md).
+
+## Live closeout checks
+
+[Direct CloudShell verification]( ../evidence/disaster-recovery/closeout-checks.md ) confirms the six-job healthy app, SQLite integrity and exported migration/recovery backup contents.

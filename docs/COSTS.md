@@ -8,7 +8,7 @@ T3 standard credits avoid unlimited surplus CPU charges. Backup/current and nonc
 
 `compute rate × runtime + IPv4 rate × allocated time + prorated gp3 + S3 storage/versions/requests + telemetry/logs + SNS + transfer`.
 
-Official pricing reviewed on 2026-10-03 lists public IPv4 at $0.005/hour: $0.04 for 8 hours or $3.65 for 730 hours before eligible credits/allowances. These figures cover the address only, not total operating cost. Actual cost depends on region, usage and account offer. No actual AWS bill is available because cloud execution has not occurred.
+Official pricing reviewed on 2026-10-03 lists public IPv4 at $0.005/hour: $0.04 for 8 hours or $3.65 for 730 hours before eligible credits/allowances. These figures cover the address only, not total operating cost. Actual cost depends on region, usage and account offer. The AWS lab ran in us-east-2. No actual billing export was retained, so total spend and savings are not claimed. Teardown status is tracked in [TEARDOWN.md](TEARDOWN.md).
 
 [VPC pricing](https://aws.amazon.com/vpc/pricing/), [EC2](https://aws.amazon.com/ec2/pricing/on-demand/), [EBS](https://aws.amazon.com/ebs/pricing/), [S3](https://aws.amazon.com/s3/pricing/), [CloudWatch](https://aws.amazon.com/cloudwatch/pricing/).
 

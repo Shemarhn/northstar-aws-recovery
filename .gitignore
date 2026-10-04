@@ -12,3 +12,5 @@ evidence/private/
 payload/
 personal-guidance/
 DEPLOYMENT-WALKTHROUGH.md
+
+.deck-build/

@@ -1,51 +1,43 @@
-# Case study: protecting Northstar Repairs
+# Case study: Northstar Repairs
 
 **Author:** Shemar Marks
+**Scenario:** synthetic small business, five-person repair shop
+**Lab:** Proxmox migration and AWS recovery in us-east-2
 
-**Context:** synthetic small-business proof of concept
+## Problem
 
-**Deliverable:** working repair application, recoverable infrastructure implementation, and operational engineering record
+The repair register connects received equipment with work in progress and customer collections. A single on-premises Proxmox VM placed both the application and its records within one failure boundary. Losing that server threatened the shop's ability to find active jobs and resume work.
 
-## Business risk
+## Architecture and implementation
 
-A small repair shop uses its job register to connect received equipment, work in progress and items ready for collection. The application is useful even when its infrastructure is simple. Its critical weakness is dependence on one manually configured VM: a failed disk or lost server can remove both the records and the knowledge required to recreate the service.
+The Python/SQLite app persists job IDs, customer aliases, device issues, status and UTC creation times. Terraform defines a dedicated VPC/subnet, encrypted EC2 root disk, private versioned S3 bucket, instance role, CloudWatch log group, four alarms and SNS notifications. Bootstrap installs the application as an unprivileged systemd service.
 
-The baseline workload is a Python/SQLite repair desk intended for an Ubuntu VM on Proxmox. The protected implementation adds an independently stored data copy, explicit access controls, operational signals and a repeatable hosting definition. This is a synthetic scenario rather than a claimed client engagement.
+Session Manager supports administration and encrypted port forwarding. The app binds to loopback, and the security group defines no inbound rules. IMDSv2 is required. Scoped instance permissions separate release/backup reads from backup writes. These are source-defined controls. The available evidence demonstrates working access and workload recovery, without claiming exhaustive IAM negative testing.
 
-## Application delivered
+## Migration
 
-The repair desk persists customer aliases, device/issues, status and UTC creation timestamps. Staff create intake records and move them through Received, In progress, Ready and Collected. Queries are parameterized, displayed data is escaped, invalid inputs are rejected, and state-changing requests require a process-specific CSRF token. The service runs under a dedicated unprivileged identity and exposes a database-aware health endpoint.
+The operator completed the Proxmox-to-AWS workload migration in the lab. The project record describes an S3 migration archive and the active AWS application. This closeout recovered the final app and email screenshots, but no original Proxmox baseline or migration command transcript. The migration is recorded as an operator-observed result, with the retained artifacts identified separately.
 
-This workload establishes a concrete recovery invariant: the original job IDs, records and statuses must return. A green health endpoint alone is insufficient.
+## Disaster-recovery exercise
 
-## Infrastructure intervention
+The project record describes deliberate EC2 replacement, an initially empty replacement workload, selection of an S3 backup and restoration of six jobs. It records SQLite integrity `ok`. The final screenshot corroborates the recovered workload with jobs 1–6 and `DR-TEST` in Ready status.
 
-Terraform defines one encrypted EC2 instance, a dedicated VPC/subnet and outbound route, an instance profile, a private versioned S3 bucket, a log group, four alarms and SNS notifications. There is no public web or SSH ingress. Session Manager supplies remote access; the application listens only on loopback.
+**Measured recovery time: 12 minutes**, as supplied by the operator for one recovery exercise. The retained record does not contain exact start/end timestamps or a complete stopwatch definition. This is an operator-measured exercise result, not an independently recomputed timing or production SLA. The 30-minute design target was met in that exercise. No achieved RPO is inferred from the hourly backup schedule or the surviving marker.
 
-Bootstrap installs the release and service, generates an on-host application credential, configures scheduled snapshots/telemetry, and initializes backup/health signals. The release fingerprint changes user data when source changes, making replacement visible in Terraform plans.
+## Monitoring evidence
 
-SQLite's online backup API captures a consistent dataset during WAL-backed operation. A successful upload alone advances the backup marker. The restore implementation validates the candidate before stopping the service, preserves the old database/journal files, installs the replacement with correct ownership and checks health. Recoverable data is separated from the replaceable root disk.
+The original email screenshot shows Northstar app, disk and backup alarms in both `ALARM` and `OK`, plus a status-check alarm for the replacement instance in US East (Ohio). This establishes notification delivery during the lab. Missing telemetry during replacement/bootstrap may account for transitions because the configured alarms treat missing data as breaching. The application-health alarm was the alarm under test. Live CloudShell history also shows the service-stop command, a failed health request and metric publication.
 
-## Before and implemented after
+## Evidence and outcome
 
-| Original dependency | Implemented change | Engineering consequence |
-|---|---|---|
-| Manual server configuration | Terraform and bootstrap | Hosting definition is version-controlled and reconstructable |
-| Records confined to one VM | Consistent snapshots uploaded to S3 | A selected dataset can survive root-disk replacement |
-| Staff discover failure | Health, disk and backup-freshness signals | Service failure, stale protection and missing telemetry are represented separately |
-| Informal recovery knowledge | Restore implementation and runbook | Recovery has defined inputs, validation and rollback behavior |
-| Unbounded infrastructure choices | Small compute, standard CPU credits and retention limits | Cost-bearing components remain explicit and proportionate |
+[The evidence index](../evidence/README.md) preserves original screenshots, file hashes, visible recovered rows and source attribution. The prior local and Linux-hosted tests remain valid evidence of application behavior and snapshot recovery.
 
-These are properties of the delivered implementation, not measurements of a deployed AWS environment.
+The lab demonstrated workload migration, independent backup recovery and a functioning notification path. Six validation jobs returned in the recovered app, with an operator-measured 12-minute recovery time. AWS teardown remains pending live-state access and must be documented after execution.
 
-## Substantiated findings
+## Lessons and limits
 
-Local execution verifies authenticated workflow, request controls, restart persistence and consistent snapshots. The local recovery test records deliberate dataset loss and restoration independently of AWS. Terraform formatting and provider-schema validation passed during implementation. The [evidence record](../evidence/README.md) states the exact execution boundary.
+A healthy endpoint alone does not prove business recovery. Job count, original IDs, statuses and the recovery marker make the restored workload inspectable. Replacement also changes instance-specific alarm dimensions and regenerates the application password, so recovery includes reconnecting access and using the replacement credential securely.
 
-Proxmox-to-AWS comparison, enforced AWS permissions, delivered alarm notifications and cloud server replacement remain unobserved. No achieved recovery time, availability improvement or AWS bill is invented.
+Store evidence outside the lab before deleting versioned backups. Review both Terraform state and AWS inventories when closing the exercise. Empty state alone does not prove there are no orphaned resources.
 
-## Decisions and limits
-
-A standard-library service and SQLite avoid an unrelated container registry or database service. SSM and zero ingress preserve remote access without a public HTTP endpoint. A public address supplies outbound connectivity without NAT Gateway or paid interface endpoints.
-
-The design still has a single-server availability boundary, same-account regional backup, broad HTTPS egress and a shared application identity. The separate production reference adds independent backup protection, individual identities and multiple availability zones where real requirements justify the operating cost.
+The design retains one-server availability, a shared app identity, broad HTTPS egress and same-account regional backup. Versioning is not immutable retention. Production requirements could justify individual identities, independent backup protection and multiple availability zones. This synthetic lab does not claim client delivery, production uptime, cost savings or comprehensive security validation.

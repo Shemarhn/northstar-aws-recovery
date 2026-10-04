@@ -1,6 +1,22 @@
 # Verification evidence
 
-This directory contains observed local execution, with source hashes and actual command output. It contains no simulated AWS screenshots or inferred cloud results.
+## Proxmox and AWS exercise
+
+The operator completed migration and recovery in us-east-2 on 2026-10-04. This index distinguishes original retained artifacts from operator measurements and the prior project record. No AWS screenshot is simulated.
+
+| Artifact or result | What it supports | Limits |
+|---|---|---|
+| [Post-recovery app](disaster-recovery/post-recovery-app.png) | Six visible jobs, IDs 1–6, DR-TEST Ready | Local forwarded URL alone does not identify the host. AWS replacement attribution comes from the project record |
+| [CloudWatch/SNS email list](monitoring/cloudwatch-sns-email.png) | App, disk, backup ALARM/OK delivery and status-check alarm in Ohio | Email bodies and timezone not visible. Causes and detection latency not established |
+| [Recovery summary](disaster-recovery/observed-results.md) | Attributed 0-to-6 restore, integrity ok and 12-minute operator measurement | Summary, not a raw terminal transcript |
+| Proxmox baseline and migration | Operator reports completed Proxmox-to-AWS lab | Earlier baseline/migration attachments unavailable in the retrieved history |
+| Teardown | Pending | No deletion claimed |
+
+![Recovered workload](disaster-recovery/post-recovery-app.png)
+
+![Delivered alarm and recovery emails](monitoring/cloudwatch-sns-email.png)
+
+Original recovered PNGs were inspected for passwords, keys, account IDs and private contact details. None are visible. Synthetic customer aliases and resource instance IDs remain. [SHA256 manifest](SHA256SUMS.txt) identifies the preserved screenshots.
 
 ## Application and local recovery
 
@@ -25,8 +41,10 @@ Four tests passed. The structured record includes execution time, exact before/r
 
 The same four tests and shell-syntax checks also passed on an Ubuntu 24.04.5 GitHub-hosted runner for commit `09ddece`. The [actual workflow run](https://github.com/Shemarhn/northstar-aws-recovery/actions/runs/37175839709) and [captured test-log excerpt](hosted-test-results.txt) provide a second execution environment. This is application/recovery verification under Linux, not an AWS deployment test. The read-only verification workflow is committed under .github/workflows/.
 
-## Infrastructure verification boundary
+## Infrastructure checks and remaining limits
 
-Terraform 1.9.8 formatting and provider-schema validation previously passed with AWS 5.100.0 and archive 2.8.1. The lockfile records these dependencies. These checks establish syntactic/schema validity, not an observed AWS deployment.
+Terraform formatting and provider-schema validation previously passed with Terraform 1.9.8, AWS 5.100.0 and archive 2.8.1. The deployed lab now has operator-observed migration/recovery and original final screenshots. Those artifacts do not establish exhaustive security enforcement tests, measured RPO, uptime or actual costs. Preserve private state, deployment values and backup exports outside the public repository.
 
-Proxmox migration, EC2 bootstrap, enforced IAM/SG controls, scheduled S3 backups, delivered alarm emails, instance replacement and teardown have no execution evidence yet. No achieved cloud RPO/RTO, uptime or cost reduction is asserted. The design diagrams document the implementation topology and its limits.
+## Live closeout checks
+
+[Direct CloudShell verification]( disaster-recovery/closeout-checks.md ) confirms the six-job healthy app, SQLite integrity and exported migration/recovery backup contents.

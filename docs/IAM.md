@@ -23,4 +23,4 @@ State and saved plans contain infrastructure identifiers and remain outside vers
 
 HTTPS internet egress is broad, not a network endpoint allowlist. IMDSv2 does not isolate role credentials after host compromise. SSM forwarding payloads are not an application audit trail. Basic auth has no user-specific lockout/reset lifecycle. Same-account regional backup does not address account compromise or regional failure.
 
-This document records configured controls; enforced cloud behavior remains unobserved until account execution. The production reference addresses stronger identity and backup boundaries separately.
+The AWS lab executed and the recovered workload was accessed through Session Manager port forwarding. This document describes configured controls; the retained evidence does not establish comprehensive IAM denial testing. The production reference addresses stronger identity and backup boundaries separately.
