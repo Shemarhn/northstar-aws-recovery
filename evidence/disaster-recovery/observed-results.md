@@ -6,7 +6,7 @@ Source: operator's current closeout request and retrieved Plan Portfolio Project
 - Prior record identifies original EC2 i-0cee3abb987d19f8a and replacement i-03fc5a7a6e91fa9a7. Both appear in the retained email screenshot.
 - Prior record describes an empty replacement workload, S3 restoration of six jobs and SQLite integrity ok.
 - Prior record mentions a recovery backup with suffix 203013Z. The closeout subsequently confirmed the key as backups/2026/10/04/20261004T203013Z.sqlite.gz. See closeout-checks.md for its hash and directly verified contents.
-- Operator-measured recovery time: 12 minutes. Exact start/end timestamps and timing boundary are unavailable.
+- Operator-observed recovery duration: **12 minutes exactly**, from **2026-10-04 20:32:16 to 20:44:16 UTC**. The endpoint is validated data, integrity and health. Elapsed time includes CloudShell recycling and Terraform reinstallation. [Full timing record](recovery-timeline.md).
 - App screenshot corroborates the final six rows below. Creation timestamps are data timestamps, not recovery timing endpoints.
 
 | ID | Alias | Device / issue | Status | Created UTC |

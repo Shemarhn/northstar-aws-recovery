@@ -16,7 +16,7 @@ The same four tests and Bash syntax checks also passed on a Linux GitHub-hosted 
 
 The operator completed the Proxmox-to-AWS migration and EC2 replacement recovery in us-east-2. The recovered app screenshot directly shows six jobs, including DR-TEST. The email screenshot directly shows delivered Northstar ALARM and OK notifications.
 
-The prior project record reports zero jobs before S3 restoration, six afterward and SQLite integrity ok. The operator supplied a measured 12-minute RTO. The closeout directly checked the recovered application and exported backups, including six jobs and integrity ok. Exact original recovery timing endpoints and Proxmox screenshots were not retrieved. These results are attributed to the operator/project record rather than presented as new execution here.
+The prior project record reports zero jobs before S3 restoration, six afterward and SQLite integrity ok. The operator supplied a 12-minute observed recovery duration with UTC endpoints and a complete timing definition. See [recovery timeline](../evidence/disaster-recovery/recovery-timeline.md). The closeout directly checked the recovered application and exported backups, including six jobs and integrity ok. The current operator-supplied record gives 2026-10-04 20:32:16–20:44:16 UTC, including CloudShell recycling and Terraform reinstallation. Original Proxmox screenshots were not retrieved. These results are attributed to the operator/project record rather than presented as new execution here.
 
 ## Verification limits
 

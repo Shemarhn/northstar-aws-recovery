@@ -16,13 +16,13 @@ Session Manager supports administration and encrypted port forwarding. The app b
 
 ## Migration
 
-The operator completed the Proxmox-to-AWS workload migration in the lab. The project record describes an S3 migration archive and the active AWS application. This closeout recovered the final app and email screenshots and directly inspected the exported migration database with five jobs and integrity ok. No original Proxmox baseline screenshot or migration command transcript was retrieved. The migration is recorded as an operator-observed result, with the retained artifacts identified separately.
+The operator completed the Proxmox-to-AWS workload migration in the lab. The supplied Proxmox migration snapshot SHA256 is `961bcfc1e52a01246cddbbd36fe7dbba34ecad1b6c38e6007d14d21e2a0ccbe6`. The project record describes an S3 migration archive and the active AWS application. This closeout recovered the final app and email screenshots and directly inspected the exported migration database with five jobs and integrity ok. No original Proxmox baseline screenshot or migration command transcript was retrieved. The migration is recorded as an operator-observed result, with the retained artifacts identified separately.
 
 ## Disaster-recovery exercise
 
 The project record describes deliberate EC2 replacement, an initially empty replacement workload, selection of an S3 backup and restoration of six jobs. It records SQLite integrity `ok`. The final screenshot corroborates the recovered workload with jobs 1–6 and `DR-TEST` in Ready status.
 
-**Measured recovery time: 12 minutes**, as supplied by the operator for one recovery exercise. The retained record does not contain exact start/end timestamps or a complete stopwatch definition. This is an operator-measured exercise result, not an independently recomputed timing or production SLA. The 30-minute design target was met in that exercise. No achieved RPO is inferred from the hourly backup schedule or the surviving marker.
+**Observed recovery time: 12 minutes exactly.** The operator supplied the UTC endpoints: **2026-10-04 20:32:16** initiation and **20:44:16** validated completion. Timing ended after data, SQLite integrity and application health checks. CloudShell recycled and Terraform required reinstallation during the exercise; the timer was not paused. [The recovery timeline](../evidence/disaster-recovery/recovery-timeline.md) documents the boundary and reproducible 720-second subtraction. This is one operator-observed result against a 30-minute design target. It establishes neither repeatability nor a production SLA. No measured RPO is claimed.
 
 ## Monitoring evidence
 

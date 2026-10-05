@@ -4,7 +4,7 @@
 
 Northstar Repairs is a synthetic five-person repair-shop scenario. Its job register originally depended on one Proxmox VM. The lab migrated the Python/SQLite workload to AWS, separated backups from the application disk, and exercised recovery after replacing the EC2 server.
 
-**Result:** the operator measured a **12-minute recovery time** for the exercise. The recovered application displays **all six validation jobs**, including `DR-TEST`. CloudWatch/SNS emails show delivered `ALARM` and `OK` notifications. [Evidence and measurement limits](evidence/README.md).
+**Result:** one operator-observed recovery took **12 minutes exactly**, from **20:32:16 to 20:44:16 UTC on 2026-10-04**, including a CloudShell recycle and Terraform reinstallation. [Timing definition](evidence/disaster-recovery/recovery-timeline.md). The recovered application displays **all six validation jobs**, including `DR-TEST`. CloudWatch/SNS emails show delivered `ALARM` and `OK` notifications. [Evidence and measurement limits](evidence/README.md).
 
 ![Recovered application with six jobs](evidence/disaster-recovery/post-recovery-app.png)
 
@@ -21,7 +21,7 @@ Terraform defines a dedicated VPC, one encrypted EC2 instance, an instance role,
 | Proxmox to AWS migration | Completed in the lab | Operator report and prior project record |
 | EC2 replacement and S3 restore | Replacement started empty, then restored six jobs with SQLite integrity `ok` | Prior project record, corroborated by recovered-app screenshot |
 | Recovered application | Six jobs visible, including recovery marker | Original screenshot |
-| Recovery time | 12 minutes, operator-measured in one exercise | Operator measurement, raw start/end timestamps not available in this checkout |
+| Recovery time | 12 minutes, operator-measured in one exercise | [UTC timeline](evidence/disaster-recovery/recovery-timeline.md): 20:32:16–20:44:16 UTC, including CloudShell interruption |
 | Monitoring notifications | App, disk and backup `ALARM`/`OK` emails and status-check alarm delivered | Original email-list screenshot |
 
 The application-health alarm was tested by stopping Northstar and publishing unhealthy metrics. The delivered ALARM and OK emails document the notification path. No measured RPO, availability percentage or cost saving is claimed.
@@ -31,6 +31,7 @@ The application-health alarm was tested by stopping Northstar and publishing unh
 - [Case study](docs/CASE-STUDY.md)
 - [Verification and evidence limits](docs/VERIFICATION.md)
 - [Evidence index](evidence/README.md)
+- [Recovery timeline and timing boundary](evidence/disaster-recovery/recovery-timeline.md)
 - [Case-study presentation](docs/presentation/Northstar-Repairs-Case-Study.pptx)
 - [Architecture](docs/ARCHITECTURE.md), [decisions](docs/DECISIONS.md), [security](docs/IAM.md)
 - [Recovery runbook](docs/RUNBOOK.md), [costs](docs/COSTS.md), [teardown record](docs/TEARDOWN.md)

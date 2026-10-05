@@ -9,6 +9,7 @@ The operator completed migration and recovery in us-east-2 on 2026-10-04. This i
 | [Post-recovery app](disaster-recovery/post-recovery-app.png) | Six visible jobs, IDs 1–6, DR-TEST Ready | Local forwarded URL alone does not identify the host. AWS replacement attribution comes from the project record |
 | [CloudWatch/SNS email list](monitoring/cloudwatch-sns-email.png) | App, disk, backup ALARM/OK delivery and status-check alarm in Ohio | Email bodies and timezone not visible. Causes and detection latency not established |
 | [Recovery summary](disaster-recovery/observed-results.md) | Attributed 0-to-6 restore, integrity ok and 12-minute operator measurement | Summary, not a raw terminal transcript |
+| [Recovery timeline](disaster-recovery/recovery-timeline.md) | Operator-supplied UTC endpoints, timing boundary and 720-second elapsed duration including interruption | Sanitized operator record, not a raw command transcript or repeatability test |
 | Proxmox baseline and migration | Operator reports completed Proxmox-to-AWS lab | Earlier baseline/migration attachments unavailable in the retrieved history |
 | [Teardown verification](teardown/verification.json) | 25 resources destroyed, empty state, no active Northstar lab resources | Historical instance/metric records can remain |
 
@@ -47,7 +48,7 @@ Terraform formatting and provider-schema validation previously passed with Terra
 
 ## Live closeout checks
 
-[Direct CloudShell verification]( disaster-recovery/closeout-checks.md ) confirms the six-job healthy app, SQLite integrity and exported migration/recovery backup contents.
+[Direct CloudShell verification](disaster-recovery/closeout-checks.md) confirms the six-job healthy app, SQLite integrity and exported migration/recovery backup contents.
 
 ## Completed teardown
 
